@@ -340,11 +340,11 @@ These predictions should be treated as a way to **prioritize compounds for furth
 
 A few things stood out from the project:
 
-1. Molecular representation made a large difference in model performance.
-2. Morgan fingerprints worked substantially better than the small descriptor set I tested.
-3. Random Forest performed slightly better than XGBoost on this scaffold-based test set.
-4. Scaffold splitting makes the problem harder than a simple random split, but gives a more realistic test of generalization to new chemical structures.
-5. Model interpretation is useful, but important features should not automatically be treated as causal biological mechanisms.
+- Molecular representation made a large difference in model performance.
+- Morgan fingerprints worked substantially better than the small descriptor set I tested.
+- Random Forest performed slightly better than XGBoost on this scaffold-based test set.
+- Scaffold splitting makes the problem harder than a simple random split, but gives a more realistic test of generalization to new chemical structures.
+- Model interpretation is useful, but important features should not automatically be treated as causal biological mechanisms.
 
 ---
 
@@ -378,29 +378,6 @@ Some things I would like to try next:
 - Ensemble models
 - Graph neural networks
 - More detailed chemical interpretation
-
----
-
-# Project Structure
-
-```text
-drug-activity-prediction/
-│
-├── README.md
-├── Drug_Activity_Prediction.ipynb
-│
-├── data/
-│   └── README.md
-│
-├── figures/
-│   ├── class_distribution.png
-│   ├── model_comparison.png
-│   ├── representation_comparison.png
-│   ├── shap_importance.png
-│   └── prediction_distribution.png
-│
-└── requirements.txt
-```
 
 ---
 
