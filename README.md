@@ -2,15 +2,15 @@
 
 A machine learning project to predict whether a molecule is active against the **BACE-1 target** using its chemical structure.
 
-I used the BACE dataset from MoleculeNet and compared a few different machine learning approaches and molecular representations. The main idea was to see how much useful information we can get from the structure of a molecule alone.
+The BACE dataset from MoleculeNet is used to compare machine-learning approaches and molecular representations, and to assess how much activity information is available from molecular structure alone.
 
 ---
 
-## What is the problem?
+## Problem
 
 This is a binary classification problem.
 
-For each molecule, we have:
+Each molecule has:
 
 - A **SMILES** string describing its chemical structure
 - An activity label for the BACE-1 target
@@ -24,7 +24,7 @@ The labels are:
 
 Here, "active" means that the compound was classified as active against the BACE-1 target in the dataset. It does not mean that the compound is an approved drug or that it has been shown to work in humans.
 
-The goal of the project is therefore:
+The prediction workflow is:
 
 ```text
 Molecular structure
@@ -72,7 +72,7 @@ The dataset contains **1,513 molecules**.
 
 ### 1. Reading and checking the data
 
-I first loaded the BACE dataset and checked:
+The BACE dataset was loaded and checked for:
 
 - dataset shape
 - missing values
@@ -81,7 +81,7 @@ I first loaded the BACE dataset and checked:
 - molecular validity
 - basic molecular properties
 
-This was mainly to understand what I was working with before training any models.
+These checks summarize the data before model training.
 
 ---
 
@@ -89,7 +89,7 @@ This was mainly to understand what I was working with before training any models
 
 The structures were provided as SMILES strings.
 
-I used **RDKit** to convert them into molecular objects:
+**RDKit** converts the SMILES strings into molecular objects:
 
 ```text
 SMILES
@@ -97,13 +97,13 @@ SMILES
 RDKit molecule
 ```
 
-This allowed me to calculate molecular properties and generate fingerprints from the structures.
+The molecular objects support descriptor calculations and fingerprint generation.
 
 ---
 
 ## 3. Morgan fingerprints
 
-For the main ML models, I represented each molecule using a **Morgan fingerprint**.
+The main models use **Morgan fingerprints** to represent each molecule.
 
 The settings used were:
 
@@ -136,9 +136,9 @@ The final fingerprint representation had:
 
 ## 4. Molecular descriptors
 
-I also wanted to see whether simpler molecular properties could predict activity.
+The analysis also evaluates whether simpler molecular properties can predict activity.
 
-I calculated nine descriptors using RDKit:
+Nine descriptors were calculated with RDKit:
 
 - Molecular Weight
 - LogP
@@ -150,7 +150,7 @@ I calculated nine descriptors using RDKit:
 - Aromatic Ring Count
 - Fraction CSP3
 
-This gave me two different ways of describing a molecule:
+The two representations describe molecules at different levels:
 
 ```text
 Morgan fingerprints
@@ -164,7 +164,7 @@ Molecular descriptors
 
 ## 5. Scaffold split
 
-Instead of simply randomly splitting the molecules, I used a **scaffold-based split**.
+The data use a **scaffold-based split** rather than a random split.
 
 This was done because a random split can put very similar molecules into both the training and test sets.
 
@@ -180,11 +180,11 @@ This makes the evaluation more challenging and gives a better idea of how the mo
 
 # Models
 
-I compared three models using Morgan fingerprints.
+Three models were compared using Morgan fingerprints.
 
 ### Logistic Regression
 
-I used Logistic Regression as a simple baseline.
+Logistic Regression provides a simple baseline.
 
 It is useful because it gives us a straightforward reference point before moving to more complex models.
 
@@ -198,7 +198,7 @@ It can capture nonlinear relationships between molecular features, which is usef
 
 XGBoost is another tree-based method, but unlike Random Forest, the trees are built sequentially so that later trees can focus on correcting previous errors.
 
-I also trained a Random Forest using the nine molecular descriptors to compare the two molecular representations.
+A second Random Forest, trained on the nine molecular descriptors, provides a comparison between the two molecular representations.
 
 ---
 
@@ -229,7 +229,7 @@ Test PR-AUC:  0.8908
 
 ## Why ROC-AUC and PR-AUC?
 
-I used ROC-AUC rather than relying only on accuracy because the model produces probabilities and we want to evaluate how well it separates active compounds from inactive compounds across different thresholds.
+ROC-AUC evaluates how well the model ranks active compounds above inactive compounds across probability thresholds, rather than measuring accuracy at a single threshold.
 
 A ROC-AUC of:
 
@@ -240,7 +240,7 @@ A ROC-AUC of:
 
 The best model achieved a ROC-AUC of **0.9043**.
 
-I also used PR-AUC because it focuses more directly on the precision-recall tradeoff for the active class.
+PR-AUC summarizes the precision-recall tradeoff for the active class.
 
 The best model achieved a PR-AUC of **0.8908**.
 
@@ -248,7 +248,7 @@ The best model achieved a PR-AUC of **0.8908**.
 
 # Fingerprints vs. Molecular Descriptors
 
-One of the more interesting results was the difference between the two molecular representations.
+The two molecular representations produced different results.
 
 The Random Forest using Morgan fingerprints achieved:
 
@@ -262,31 +262,31 @@ while the Random Forest using the nine molecular descriptors achieved:
 ROC-AUC = 0.7949
 ```
 
-This suggests that the detailed structural information captured by the Morgan fingerprints was more useful for this particular prediction task than the selected global molecular properties.
+For this prediction task, Morgan fingerprints provided more useful information than the selected global molecular properties.
 
-In other words, properties such as molecular weight, LogP and TPSA alone were not enough to capture all the information the model could learn from the molecular structure.
+Molecular weight, LogP, and TPSA alone did not capture all of the predictive information available from molecular structure.
 
 ---
 
 # Model Interpretation
 
-After comparing the models, I also looked at what the Random Forest was actually using.
+After model comparison, feature importance was examined to see which fingerprint bits influenced the Random Forest.
 
 ## Feature importance
 
 Random Forest provides feature importance scores for the fingerprint features.
 
-This helped identify which of the 2,048 fingerprint bits had the largest influence on the model.
+This identifies the fingerprint bits with the largest influence on the model.
 
 A fingerprint bit does not directly mean something simple like "contains oxygen". It represents a hashed local structural environment.
 
-So I used RDKit to trace important fingerprint bits back to molecular environments where possible.
+RDKit was used to trace important fingerprint bits back to molecular environments where possible.
 
 ---
 
 ## SHAP
 
-I also used **SHAP (SHapley Additive exPlanations)** to get a more detailed view of the model's predictions.
+**SHAP (SHapley Additive exPlanations)** provides a more detailed view of the model's predictions.
 
 SHAP helps answer questions such as:
 
@@ -303,7 +303,7 @@ One important limitation is that SHAP or feature importance does **not** prove t
 
 # Predicting a New Molecule
 
-I also created a small prediction function so that the trained model can be used with a new SMILES string.
+A prediction function applies the trained model to a new SMILES string.
 
 The workflow is:
 
@@ -336,12 +336,12 @@ These predictions should be treated as a way to **prioritize compounds for furth
 
 ---
 
-# What I learned
+# Key observations
 
-A few things stood out from the project:
+Key observations:
 
 - Molecular representation made a large difference in model performance.
-- Morgan fingerprints worked substantially better than the small descriptor set I tested.
+- Morgan fingerprints worked substantially better than the selected descriptor set.
 - Random Forest performed slightly better than XGBoost on this scaffold-based test set.
 - Scaffold splitting makes the problem harder than a simple random split, but gives a more realistic test of generalization to new chemical structures.
 - Model interpretation is useful, but important features should not automatically be treated as causal biological mechanisms.
@@ -359,13 +359,13 @@ There are still several things that could be improved.
 - There was no independent external dataset used for final validation.
 - Computational predictions still need experimental validation.
 
-Because of these limitations, I would not claim that a ROC-AUC of 0.9043 means the model will perform equally well on every new chemical library.
+Because of these limitations, a ROC-AUC of 0.9043 does not imply equal performance on every new chemical library.
 
 ---
 
 # Future Improvements
 
-Some things I would like to try next:
+Potential next steps:
 
 - Repeated scaffold cross-validation
 - More systematic hyperparameter tuning
@@ -383,7 +383,7 @@ Some things I would like to try next:
 
 # Final Result
 
-The final model from this project was:
+The best-performing model was:
 
 ```text
 Random Forest
@@ -398,4 +398,4 @@ Test ROC-AUC = 0.9043
 Test PR-AUC  = 0.8908
 ```
 
-Overall, this project gave me experience with the complete workflow of a small molecular machine-learning problem: starting from chemical structures, choosing a molecular representation, creating a scaffold-based evaluation split, comparing different ML models, interpreting the predictions, and finally using the trained model to predict activity for unseen molecules.
+The workflow covers molecular structure processing, feature generation, scaffold-based evaluation, model comparison, prediction interpretation, and activity prediction for held-out molecules.
